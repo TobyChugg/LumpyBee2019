@@ -20,9 +20,12 @@ bool motors_on = true;
 
 
 //PID constants
-Vector3 roll_coefficients(4, 0.03, 60); //(P, I, D)
-Vector3 pitch_coefficients(4, 0.03, 60);
-Vector3 yaw_coefficients(6, 0, 0);
+
+
+Vector3 roll_coefficients(3, 0.03, 60); //(P, I, D)
+Vector3 pitch_coefficients(3, 0.03, 60);
+Vector3 yaw_coefficients(6, 0, 10);
+
 
 //objects
 Mpu6050 mpu6050;
@@ -67,7 +70,7 @@ void loop() {
     orientation = mpu6050.get_rpy(); //get roll pitch yaw
     stickdegrees = receiver.get_stick_PWM(); //get receiver PWM signal
     throttle = receiver.get_receiver_throttle(); //get throttle
-    if(debugging && !motors_on){throttle = 1500; stickdegrees.set_vector(1500, 1500, 1500);}
+    //if(debugging && !motors_on){throttle = 1500; stickdegrees.set_vector(1500, 1500, 1500);}
     pidcontrol = pid_controller.calculate_PID_signal(stickdegrees, orientation); //calculate PID values
     motorcontroller.calculate_esc_PWM(throttle, pidcontrol); //convert to ESC PWM values, accessed by get_esc_PWM_FL() etc..
 
@@ -92,7 +95,8 @@ void loop() {
       
       //orientation.print_Vector3();
       //pidcontrol.print_Vector3();
-      Serial.print("FL: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_FL()); Serial.print(" ");  Serial.print("FR: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_FR()); Serial.print(" ");  Serial.print("BL: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_BL()); Serial.print(" ");  Serial.print("BR: "); Serial.print(" "); Serial.println(motorcontroller.get_esc_PWM_BR());
+      //Serial.println(pidcontrol.get_z());
+      //Serial.print("FL: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_FL()); Serial.print(" ");  Serial.print("FR: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_FR()); Serial.print(" ");  Serial.print("BL: "); Serial.print(" "); Serial.print(motorcontroller.get_esc_PWM_BL()); Serial.print(" ");  Serial.print("BR: "); Serial.print(" "); Serial.println(motorcontroller.get_esc_PWM_BR());
 
       startMicros_2 = currentMicros_2; //reset timer
    }

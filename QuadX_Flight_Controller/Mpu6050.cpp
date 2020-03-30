@@ -12,6 +12,8 @@
 Vector3 drift_correction(0, 0, 0);
 bool flag = false;
 
+float tempyaw;
+
 Mpu6050::Mpu6050()
 {
   
@@ -96,17 +98,22 @@ Vector3 Mpu6050::get_rpy() //get RollPitchYaw Vector
 
   gyro_orientation.set_y(gyro_orientation.get_y() - (gyro_orientation.get_x() * sin(gyro_orientation.get_z() * 0.000001066)));                    //0.000001066 is the same as the previous constant but including the radians to degrees functionality
   gyro_orientation.set_x(gyro_orientation.get_x() + (gyro_orientation.get_y() * sin(gyro_orientation.get_z() * 0.000001066)));                  //to account for the acceleration not being present when rotating roll to pitch
+  tempyaw = gyro_orientation.get_z();
 
   //=========================== Calculate accelerometer vector angles
 
   if(abs(corrected_acc.get_x()) < acc_magnitude) {acc_orientation.set_x(asin((float)(corrected_acc.get_x()/acc_magnitude)) *57.296);}
   if(abs(corrected_acc.get_y()) < acc_magnitude) {acc_orientation.set_y(asin((float)(corrected_acc.get_y()/acc_magnitude)) *-57.296);}
-  if(abs(corrected_acc.get_z()) < acc_magnitude) {acc_orientation.set_z(asin((float)(corrected_acc.get_z()/acc_magnitude)) *57.296);}
+  //if(abs(corrected_acc.get_z()) < acc_magnitude) {acc_orientation.set_z(asin((float)(corrected_acc.get_z()/acc_magnitude)) *57.296);} //nil
+  acc_orientation.set_z(gyro_orientation.get_z());
 
 
   gyro_orientation = gyro_orientation.addition(gyro_orientation.scalar_multiplication(gyro_orientation, 0.996), gyro_orientation.scalar_multiplication(acc_orientation, 0.004)); //complementary filter
+  ////yaw does not have acc value so account for that
+  
 
   orientation = gyro_orientation;
+
 
 
   return orientation;
